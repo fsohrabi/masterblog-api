@@ -1,18 +1,43 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
+from backend.storage.storage_json import StorageJson
 
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
-
-POSTS = [
-    {"id": 1, "title": "First post", "content": "This is the first post."},
-    {"id": 2, "title": "Second post", "content": "This is the second post."},
-]
+storage = StorageJson()
 
 
 @app.route('/api/posts', methods=['GET'])
 def get_posts():
-    return jsonify(POSTS)
+    posts = storage.list_blogs()
+    return jsonify(posts)
+
+
+@app.route('/api/posts', methods=['POST'])
+def add():
+    """
+    Route for adding a new blog post.
+    """
+    data = request.get_json()
+    if data and "title" in data and "content" in data and len(data['title']) != 0 and len(data['content']) != 0:
+        title = data['title']
+        content = data['content']
+    else:
+        return jsonify({"error": "Missing Credentials", }), 400
+
+    storage.add_blog(title, content)
+    posts = storage.list_blogs()
+    return jsonify(posts[-1], 201)
+
+
+@app.route('/api/posts/<int:post_id>', methods=['delete'])
+def delete(post_id):
+    """
+    Route for deleting a blog post by its post ID.
+    """
+    storage.delete_blog(post_id)
+    posts = storage.list_blogs()
+    return jsonify(posts)
 
 
 if __name__ == '__main__':
