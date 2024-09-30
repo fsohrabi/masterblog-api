@@ -35,8 +35,27 @@ def delete(post_id):
     """
     Route for deleting a blog post by its post ID.
     """
-    storage.delete_blog(post_id)
-    return jsonify({"message": f"Post with id {post_id} has been deleted successfully."}), 200
+    if storage.delete_blog(post_id):
+        return jsonify({"message": f"Post with id {post_id} has been deleted successfully."}), 200
+    return jsonify({"error": "Post was not found", }), 404
+
+
+@app.route('/api/posts/<int:post_id>', methods=['PUT'])
+def update(post_id):
+    """
+    Route for update blog post by id .
+    """
+    data = request.get_json()
+    if data or ("title" in data and len(data['title']) != 0) or ("content" in data and len(data['content']) != 0):
+        title = data['title'] if "title" in data else None
+        content = data['content'] if "content" in data else None
+    else:
+        return jsonify({"error": "Missing Credentials", }), 400
+
+    update_result = storage.update_blog(post_id, title, content)
+    if not update_result:
+        return jsonify({"error": "Post was not found", }), 404
+    return jsonify(update_result, 201)
 
 
 if __name__ == '__main__':

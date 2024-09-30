@@ -32,14 +32,14 @@ class StorageJson(IStorage):
         self.rewrite_data()
         return True
 
-    def update_blog(self, id, title,content):
+    def update_blog(self, id, title=None, content=None):
         """update blog from the database."""
         for blog in self.blogs:
             if blog['id'] == id:
-                blog['title'] = title
-                blog['content'] = content
+                blog['title'] = title if title is not None else blog['title']
+                blog['content'] = content if content is not None else blog['content']
                 self.rewrite_data()
-                return True
+                return blog
         return False
 
     def update_like(self, id):
