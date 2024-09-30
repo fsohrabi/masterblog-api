@@ -9,8 +9,43 @@ storage = StorageJson()
 
 @app.route('/api/posts', methods=['GET'])
 def get_posts():
+    """
+    Fetch and return blog posts, sorted by query parameters.
+
+    Query Params:
+    - sort (optional): Sort by 'id', 'title', or 'content'. Defaults to 'id'.
+    - direction (optional): 'asc' for ascending, 'desc' for descending. Defaults to 'desc'.
+
+    Returns:
+    - 200: JSON list of sorted posts.
+    - 400: Error if invalid query parameters are provided.
+
+    Example:
+    /api/posts?sort=title&direction=asc
+    """
+    permissible_arguments = ['sort', 'direction']
+    sort_permissible_values = ['title', 'content', 'id']  # Added 'id' to allow sorting by default
+    direction_permissible_values = ['asc', 'desc']
+    arguments = request.args
+
+    # Validate query parameters
+    for argument, value in arguments.items():
+        if argument not in permissible_arguments:
+            return jsonify({'error': f'Unexpected key: {argument}'}), 400
+        elif argument == 'sort' and value not in sort_permissible_values:
+            return jsonify({'error': f'Invalid sort value: {value}. Expected values: {sort_permissible_values}'}), 400
+        elif argument == 'direction' and value not in direction_permissible_values:
+            return jsonify(
+                {'error': f'Invalid direction value: {value}. Expected values: {direction_permissible_values}'}), 400
+
+    sort_value = request.args.get('sort', 'id')
+    direction_value = request.args.get('direction', 'desc')
+    reverse_freq = {'desc': False, 'asc': True}
     posts = storage.list_blogs()
-    return jsonify(posts)
+    # Sort posts
+    sorted_posts = sorted(posts, key=lambda post: post.get(sort_value, ''), reverse=reverse_freq[direction_value])
+    # Return sorted posts
+    return jsonify(sorted_posts), 200
 
 
 @app.route('/api/posts', methods=['POST'])
