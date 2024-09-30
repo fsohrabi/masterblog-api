@@ -58,5 +58,33 @@ def update(post_id):
     return jsonify(update_result, 201)
 
 
+@app.route('/api/posts/search', methods=['get'])
+def search():
+    """
+        Route for searching blog posts by title or content.
+        Returns posts where either the title or content contains the search terms.
+        If no search parameters are provided, return an empty list.
+        """
+    title = request.args.get('title')
+    content = request.args.get('content')
+    posts = storage.list_blogs()
+    if not title and not content:
+        return jsonify([]), 200
+    filtered_posts = []
+
+    for post in posts:
+        # If both title and content are provided
+        if title and content:
+            if (title.lower() in post['title'].lower()) and (content.lower() in post['content'].lower()):
+                filtered_posts.append(post)
+        elif title:
+            if title.lower() in post['title'].lower():
+                filtered_posts.append(post)
+        elif content:
+            if content.lower() in post['content'].lower():
+                filtered_posts.append(post)
+    return jsonify(filtered_posts), 200
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5002, debug=True)
