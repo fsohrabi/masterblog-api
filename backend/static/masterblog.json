@@ -1,0 +1,237 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Masterblog API",
+    "version": "1.0.0",
+    "description": "API documentation for the Masterblog application."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5002"
+    }
+  ],
+  "paths": {
+    "/api/posts": {
+      "get": {
+        "summary": "Get a list of blog posts",
+        "description": "Fetch and return all blog posts, optionally sorted by title or content.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "string",
+              "enum": ["id", "title", "content"]
+            },
+            "description": "Field to sort posts by."
+          },
+          {
+            "in": "query",
+            "name": "direction",
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"]
+            },
+            "description": "Sort direction (ascending or descending)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of sorted blog posts.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "content": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters."
+          }
+        }
+      },
+      "post": {
+        "summary": "Add a new blog post",
+        "description": "Add a new blog post to the system.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "The title of the post."
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "The content of the post."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The created post.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "content": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid data."
+          }
+        }
+      }
+    },
+    "/api/posts/{post_id}": {
+      "delete": {
+        "summary": "Delete a blog post by ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "post_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true,
+            "description": "The ID of the blog post to delete."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful deletion message."
+          },
+          "404": {
+            "description": "Post not found."
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a blog post by ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "post_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true,
+            "description": "The ID of the blog post to update."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Updated post object."
+          },
+          "400": {
+            "description": "Missing data."
+          },
+          "404": {
+            "description": "Post not found."
+          }
+        }
+      }
+    },
+    "/api/posts/search": {
+      "get": {
+        "summary": "Search blog posts",
+        "description": "Search blog posts by title or content.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "title",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Title to search for."
+          },
+          {
+            "in": "query",
+            "name": "content",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Content to search for."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of posts matching the search criteria.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "content": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
