@@ -1,5 +1,7 @@
 import json
 import os
+from datetime import datetime
+
 from backend.storage.istorage import IStorage
 
 
@@ -10,13 +12,17 @@ class StorageJson(IStorage):
         self.blogs = self.load_data()  # Load existing data
 
     def list_blogs(self):
-        """Retrieve blogs from the database."""
+        """Retrieve blogs from the database and format the date for display."""
+        # Return blogs but format the date for display
+        for blog in self.blogs:
+            blog['formatted_date'] = self.get_formatted_date(blog['date'])
         return self.blogs
 
     def fetch_blog_by_id(self, id):
         """Retrieve blog from the database by id."""
         for blog in self.blogs:
             if blog['id'] == id:
+                blog['formatted_date'] = self.get_formatted_date(blog['date'])
                 return blog
         return None
 
@@ -25,25 +31,35 @@ class StorageJson(IStorage):
             return self.blogs[-1]['id'] + 1
         return 1
 
-    def add_blog(self, title, content):
+    def add_blog(self, title, content, author):
         """Add a new blog to the database."""
         self.blogs.append(
-            {"id": self.generate_simple_uid(), 'title': title, 'content': content, 'likes': 0})
+            {
+                "id": self.generate_simple_uid(),
+                'title': title,
+                'content': content,
+                'likes': 0,
+                'date': datetime.now(),
+                'author': author
+            }
+        )
         self.rewrite_data()
         return True
 
-    def update_blog(self, id, title=None, content=None):
-        """update blog from the database."""
+    def update_blog(self, id, title, content, author):
+        """Update blog in the database."""
         for blog in self.blogs:
             if blog['id'] == id:
                 blog['title'] = title if title is not None else blog['title']
                 blog['content'] = content if content is not None else blog['content']
+                blog['author'] = author if author is not None else blog['author']
+                blog['date'] = datetime.now()
                 self.rewrite_data()
                 return blog
         return False
 
     def update_like(self, id):
-        """update count of blogs likes  from the database."""
+        """Update count of blogs likes from the database."""
         for blog in self.blogs:
             if blog['id'] == id:
                 blog['likes'] += 1
@@ -88,3 +104,7 @@ class StorageJson(IStorage):
                 json.dump(self.blogs, handle, indent=4)  # Indentation for readability
         except Exception as e:
             print(f"Error writing to file: {e}")
+
+    def get_formatted_date(self, date):
+        """Format the date as dd.mm.yyyy for display purposes."""
+        return date.strftime('%d.%m.%Y')

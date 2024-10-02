@@ -21,7 +21,7 @@
             "name": "sort",
             "schema": {
               "type": "string",
-              "enum": ["id", "title", "content"]
+              "enum": ["id", "title", "content","date","author"]
             },
             "description": "Field to sort posts by."
           },
@@ -82,6 +82,10 @@
                   "content": {
                     "type": "string",
                     "description": "The content of the post."
+                  },
+                   "author": {
+                    "type": "string",
+                    "description": "The author of the post."
                   }
                 }
               }
@@ -104,6 +108,12 @@
                     },
                     "content": {
                       "type": "string"
+                    },
+                    "author": {
+                      "type": "string"
+                    },
+                    "date": {
+                      "type": "date"
                     }
                   }
                 }
@@ -163,6 +173,9 @@
                     "type": "string"
                   },
                   "content": {
+                    "type": "string"
+                  },
+                  "author": {
                     "type": "string"
                   }
                 }
